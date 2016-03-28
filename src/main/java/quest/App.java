@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import quest.model.Message;
+import quest.model.Motto;
 import quest.model.User;
 import quest.services.Utils;
 
@@ -44,9 +46,11 @@ public class App {
                 .header("team-id", teamId)
                 .get(ClientResponse.class);
 
-        String answer = response.getEntity(String.class);
+        String answerString = response.getEntity(String.class);
 
-        return  answer;
+        Gson gs = new Gson();
+        return gs.fromJson(answerString, Motto.class).getMotto();
+
     }
 
     public static String getSecondWallResult(String keyword) {
@@ -65,8 +69,8 @@ public class App {
                     .header("team-id", teamId)
                     .post(ClientResponse.class, "{ }");
 
-            String firstValue = response.getHeaders().get("header-first..").get(0);
-            String secondValue = response.getHeaders().get("header-first..").get(0);
+            String firstValue = response.getHeaders().get("direction-one-to-go").get(0);
+            String secondValue = response.getHeaders().get("direction-two-to-go").get(0);
             if (firstValue.equals("0")) {
                 firstPosition = i;
             } else if (secondValue.equals("0")) {
@@ -81,9 +85,11 @@ public class App {
                 .header("team-id", teamId)
                 .get(ClientResponse.class);
 
-        String answer = response.getEntity(String.class);
+        String answerString = response.getEntity(String.class);
 
-        return answer;
+        Gson gs = new Gson();
+        return gs.fromJson(answerString, Message.class).getMessage();
+
     }
 
     public static List<?> getThirdWallResult(String keyword) {
@@ -131,14 +137,11 @@ public class App {
 
         List<?> mapEntries = Arrays.asList(letterMap.entrySet());
 
-        mapEntries.sort(new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                if (letterMap.get(o1.toString()) >= letterMap.get(o2.toString())) {
-                    return -1;
-                } else {
-                    return 1;
-                }
+        mapEntries.sort((o1, o2) -> {
+            if (letterMap.get(o1.toString()) >= letterMap.get(o2.toString())) {
+                return -1;
+            } else {
+                return 1;
             }
         });
 
